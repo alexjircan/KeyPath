@@ -10,20 +10,26 @@
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputEmail1">Email address</label>
                     </div>
-                    <input formControlName="username" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input formControlName="email" [ngClass]="{'is-invalid': form.get('email').hasError('email')}" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <div *ngIf="form.get('email').hasError('email')">
+                        <small id="emailHelp" class="text-danger">Invalid email</small>
+                    </div>
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
                 <div class="form-group p-2">
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputPassword1">Password</label>
                     </div>
-                    <input formControlName="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <input formControlName="password" type="password" class="form-control" id="password" placeholder="Password">
                 </div>
                 <div class="form-group p-2">
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputPassword1">Confirm Password</label>
                     </div>
-                    <input formControlName="conPassword" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <input formControlName="conPassword" type="password" [ngClass]="{'is-invalid': form.hasError('notSame')}" class="form-control" id="conPassword" placeholder="Password">
+                    <div class="invalid-feedback" *ngIf="form.hasError('notSame')">
+                        Passwords does not match
+                    </div>
                 </div>
                 <div class="p-2 d-flex justify-content-center">
                     <button type="submit" class="btn btn-secondary">Register</button>
