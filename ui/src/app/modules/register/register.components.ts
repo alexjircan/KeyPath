@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 
 @Component({
     selector: 'app-register',
@@ -8,17 +8,23 @@ import { FormControl, FormGroup } from "@angular/forms";
 })
 export class RegisterComponent implements OnInit{
     
+    checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
+        let pass = group.get('password').value;
+        let confirmPass = group.get('conPassword').value
+        return pass === confirmPass ? null : { notSame: true }
+    }
+
     public form: FormGroup<{
-        username: FormControl<string>;
+        email: FormControl<string>;
         password: FormControl<string>;
         conPassword: FormControl<string>;
       }>;
 
     ngOnInit(): void {
         this.form = new FormGroup({
-            username: new FormControl(''),
+            email: new FormControl('', [Validators.email]),
             password: new FormControl(''),
             conPassword: new FormControl(''),
-          });
+          }, {validators: [this.checkPasswords]});
     }
 }
