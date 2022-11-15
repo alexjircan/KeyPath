@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { AuthModule } from './core/auth/auth.module';
 import { HomeModule } from './modules/home/home.module';
 import { LoginModule } from './modules/login/login.module';
+import { RegisterModule } from './modules/register/register.module';
 import { LayoutComponent } from './shared/layout/layout.component';
 
 @NgModule({
@@ -18,7 +19,8 @@ import { LayoutComponent } from './shared/layout/layout.component';
     AppRoutingModule,
     HomeModule,
     AuthModule,
-    LoginModule
+    LoginModule,
+    RegisterModule
   ],
   providers: [],
   bootstrap: [AppComponent]
