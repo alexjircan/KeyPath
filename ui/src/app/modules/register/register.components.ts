@@ -8,6 +8,8 @@ import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn,
 })
 export class RegisterComponent implements OnInit{
     
+
+    
     checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
         let pass = group.get('password').value;
         let confirmPass = group.get('conPassword').value
