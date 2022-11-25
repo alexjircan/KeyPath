@@ -1,0 +1,5 @@
+# Django #
+KeyPath/__pycache__
+KeyPathApp/__pycache__
+KeyPath\KeyPathApp/__pycache__
+db.sqlite3
