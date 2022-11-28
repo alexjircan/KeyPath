@@ -24,13 +24,23 @@ export class AuthService {
     }
 
     login(form: {username: string; password: string}){
-        return this.$api.post('/auth/login', form).pipe(
+        return this.$api.post('/auth/login', {email: form.username, password: form.password}).pipe(
             map( (resp) => {
                 if ( !resp.access_token || !this.validateToken(resp.access_token) ) throw new Error("Invalid username or password.");
                 window.localStorage.setItem(environment.jwt.tokenKey, resp.access_token);
                 console.log(resp);
             } )
         );
+    }
+
+    register(form: {firstname: string, lastname: string, email: string; password: string}){
+        return this.$api.post('/auth/register', form).pipe(
+            map(
+                (resp) => {
+                    if( resp !== "Registration success" ) throw new Error(resp);
+                }
+            )
+        )
     }
 
     validateToken(token: string){

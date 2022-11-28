@@ -1,6 +1,7 @@
 import { AuthService } from "@/app/core/auth/auth.service";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'app-login',
@@ -13,6 +14,7 @@ export class LoginComponent implements OnInit{
     @ViewChild('username') private usernameInput;
 
     isLoading: boolean = false;
+    loginError: boolean = false;
 
     public form: FormGroup<{
         username: FormControl<string>;
@@ -21,12 +23,13 @@ export class LoginComponent implements OnInit{
 
     constructor(
     public $auth: AuthService,
+    public $router: Router,
     ) { }
 
     ngOnInit(): void {
         this.form = new FormGroup({
-            username: new FormControl('', [Validators.email]),
-            password: new FormControl(''),
+            username: new FormControl('', [Validators.email, Validators.required]),
+            password: new FormControl('', [Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$"), Validators.required]),
           });
     }
 
@@ -42,11 +45,10 @@ export class LoginComponent implements OnInit{
             this.form.controls.username.setValue(usernameInputValue);
         }
 
-        this.$auth.login(this.form.getRawValue()).subscribe({
-            next(response) { 
-                console.log(response); },
-            error(err) { console.log(err); },
-        }).add( () => this.isLoading = false );
+        this.$auth.login(this.form.getRawValue()).subscribe(
+            resp => console.log(resp),
+            err => this.loginError = true,
+        ).add( () => this.isLoading = false );
 
         this.isLoading = true;
     }

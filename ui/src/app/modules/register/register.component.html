@@ -1,16 +1,23 @@
-<div class="gradient overflow-hidden position-fixed"></div>
 <div class="d-flex text-light align-items-center justify-content-center">
     <div>
-        <div class="p-5">
+        <div class="pb-2 pt-1">
             <img class="logo mx-auto d-block" src="/assets/logo.png"/>
         </div>
         <div class="card bg-opacity-75 bg-dark card-body ml-2 mr-2 login-card">
-            <form [formGroup] = "form">
+            <form (ngSubmit)="onSubmit()" [formGroup] = "form">
                 <div class="form-group p-2">
+                    <div class="d-flex justify-content-center p-1">
+                        <label>First Name</label>
+                    </div>
+                    <input #firstname formControlName="firstname" type="text" class="form-control" placeholder="Enter first name">
+                    <div class="d-flex justify-content-center p-1">
+                        <label>Last Name</label>
+                    </div>
+                    <input #lastname formControlName="lastname" type="text" class="form-control" placeholder="Enter last name">
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputEmail1">Email address</label>
                     </div>
-                    <input formControlName="email" [ngClass]="{'is-invalid': form.get('email').hasError('email')}" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input #username formControlName="email" [ngClass]="{'is-invalid': form.get('email').hasError('email')}" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
                     <div *ngIf="form.get('email').hasError('email')">
                         <small id="emailHelp" class="text-danger">Invalid email</small>
                     </div>
@@ -20,24 +27,43 @@
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputPassword1">Password</label>
                     </div>
-                    <input formControlName="password" type="password" class="form-control" id="password" placeholder="Password">
+                    <input #password formControlName="password" type="password" class="form-control" id="password" placeholder="Password">
+                    <div class="text-danger fs-6" *ngIf="this.form.get('password').hasError('pattern')">
+                        Password Requirements:
+                        <ul>
+                            <li>Must contain at least 8 characters</li>
+                            <li>Must contain at least one uppercase letter</li>
+                            <li>Must contain at least one lowercase letter</li>
+                            <li>Must contain at least one number</li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="form-group p-2">
                     <div class="d-flex justify-content-center p-1">
                         <label for="exampleInputPassword1">Confirm Password</label>
                     </div>
                     <input formControlName="conPassword" type="password" [ngClass]="{'is-invalid': form.hasError('notSame')}" class="form-control" id="conPassword" placeholder="Password">
-                    <div class="invalid-feedback" *ngIf="form.hasError('notSame')">
+                    <div class="text-danger" *ngIf="form.hasError('notSame')">
                         Passwords does not match
                     </div>
                 </div>
-                <div class="p-2 d-flex justify-content-center">
-                    <button type="submit" class="btn btn-secondary">Register</button>
+                <div *ngIf="isLoading == true; then loading else button">
                 </div>
-                <p class="small fw-bold mt-2 pt-1 mb-0">Have an account already? <a href="/login"
-                    class="link-primary">Login</a>
+                <p class="small fw-bold mt-2 pt-1 mb-0">Have an account already? <a role="button" 
+                    (click)="this.$router.navigate(['auth/login'])" class="link-primary">Login</a>
                 </p>
             </form>
         </div>
     </div>
 </div>
+
+<ng-template #loading>
+    <div class="p-2 d-flex justify-content-center">
+        <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+    </div>
+</ng-template>
+<ng-template #button>
+    <div class="p-2 d-flex justify-content-center">
+        <button [disabled]="!isFormValid()"  type="submit" class="btn btn-secondary">Register</button>
+    </div>
+</ng-template>
