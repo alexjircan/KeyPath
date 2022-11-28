@@ -6,5 +6,5 @@ pymongo = "3.12.1"
 [scripts]
 watch_server = "python3 manage.py runserver 8000"
 watch_ui = "npm run start --prefix ui"
-watch = "npm run start --prefix ui & python3 manage.py runserver 8000"
+watch = "bash -c 'python3 manage.py runserver 8000 & npm run start --prefix ui'"
 install_ui = "bash -c 'cd ui; npm install'"
