@@ -123,7 +123,7 @@
                 "sha256:ffcc8394123ea8d43fff8e5d000095fe7741ce3f8988366c5c919c4f5eb179d3"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==4.3.3"
+            "version": "==3.12.1"
         },
         "sqlparse": {
             "hashes": [
