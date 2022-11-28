@@ -1,4 +1,3 @@
-<div class="gradient overflow-hidden position-fixed"></div>
 <div class="d-flex text-light align-items-center justify-content-center">
     <div>
         <div class="p-5">
@@ -22,10 +21,13 @@
                     </div>
                     <input #password formControlName="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
                 </div>
+                <div *ngIf="this.loginError">
+                    <small class="form-text text-danger">Wrong email or password!</small>
+                </div>
                 <div *ngIf="isLoading == true; then loading else button">
                 </div>
-                <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="/register"
-                    class="link-primary">Register</a>
+                <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a role="button"
+                    (click)="this.$router.navigate(['auth/register'])" class="link-primary">Register</a>
                 </p>
             </form>
         </div>
@@ -39,6 +41,6 @@
 </ng-template>
 <ng-template #button>
     <div class="p-2 d-flex justify-content-center">
-        <button type="submit" class="btn btn-secondary">Login</button>
+        <button [disabled]="this.form.controls['username'].invalid || this.form.controls['password'].invalid" type="submit" class="btn btn-secondary">Login</button>
     </div>
 </ng-template>
