@@ -6,6 +6,11 @@ export const environment = {
   production: false,
   api: {
     base: 'http://localhost:8000/api'
+  },
+  jwt: {
+    tokenKey: 'access_token',
+    allowedDomains: ['localhost:8000'],
+    disallowedRoutes: ['http://localhost:8000/api/auth/login']
   }
 };
 
