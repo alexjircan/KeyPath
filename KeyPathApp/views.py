@@ -1,12 +1,13 @@
 import djongo.database
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import DatabaseError
+from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 from KeyPathApp.models import Users
 from KeyPathApp.serializers import UserSerializer
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # Create your views here.
@@ -21,7 +22,15 @@ def userLogin(request):
             return JsonResponse("Email not found", safe=False)
 
         if user.UserPassword == json_data["password"]:
-            return JsonResponse("Login success", safe=False)
+            # Generate Token
+            refresh = RefreshToken.for_user(user)
+            return JsonResponse(
+                {
+                    'access_token': str(refresh.access_token),
+                    #'refresh_token': str(refresh)
+                }
+                , status=status.HTTP_200_OK
+            )
         else:
             return JsonResponse("Password incorrect", safe=False)
 
