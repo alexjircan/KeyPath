@@ -4,6 +4,11 @@
             <img class="logo mx-auto d-block" src="/assets/logo.png"/>
         </div>
         <div class="card bg-opacity-75 bg-dark card-body ml-2 mr-2 login-card">
+            <div *ngIf="this.fromRegister" class="text-center">
+                <i class="text-success fa-xl fa-solid fa-circle-check"></i>
+                <p class="text-success"><b>Congratulations,<br> your account has been successfully created!<br>
+                You can now login.</b></p>
+            </div>
             <form (ngSubmit)="onSubmit()" [formGroup] = "form">
                 <div class="form-group p-2">
                     <div class="d-flex justify-content-center p-1">

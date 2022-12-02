@@ -1,4 +1,29 @@
-Buuun
 <div>
+    <div class="gradient overflow-hidden position-fixed"></div>
+    <header>
+        <nav class="navbar py-3 w-100 fixed-top navbar-expand-lg navbar-dark bg-dark scrolling-navbar">
+            <div class="w-100">
+                <a class="navbar-brand px-3" routerLink="/">
+                    <img class="menu-logo" src="/assets/logo2.png" />
+                </a>
+            </div>
+            <div class="w-100 d-flex justify-content-end">
+                <ul class="navbar-nav px-3">
+                    <li class="nav-item" ngbDropdo>
+                        <div ngbDropdown class="d-inline-block" placement="bottom-right" display="dynamic">
+                            <button type="button" class="btn btn-dark" id="dropdownBasic1" ngbDropdownToggle>
+                                <i class="fa-lg fa-solid fa-user"></i>
+                            </button>
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                <button ngbDropdownItem>Action - 1</button>
+                                <button ngbDropdownItem>Another Action</button>
+                                <button (click)="onLogout()" ngbDropdownItem>Logout</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
     <router-outlet></router-outlet>
 </div>

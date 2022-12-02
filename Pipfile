@@ -9,7 +9,7 @@ djangorestframework="3.13.1"
 djangorestframework-simplejwt="5.0.0"
 
 [scripts]
-watch_server = "python3 manage.py runserver 8000"
+watch_server = "python manage.py runserver 8000"
 watch_ui = "npm run start --prefix ui"
-watch = "bash -c 'python3 manage.py runserver 8000 & npm run start --prefix ui'"
+watch = "bash -c 'python manage.py runserver 8000 & npm run start --prefix ui'"
 install_ui = "bash -c 'cd ui; npm install'"

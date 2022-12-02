@@ -47,6 +47,9 @@
                         Passwords does not match
                     </div>
                 </div>
+                <div *ngIf="this.registerError">
+                    <small class="form-text text-danger">{{this.registerError}}</small>
+                </div>
                 <div *ngIf="isLoading == true; then loading else button">
                 </div>
                 <p class="small fw-bold mt-2 pt-1 mb-0">Have an account already? <a role="button" 

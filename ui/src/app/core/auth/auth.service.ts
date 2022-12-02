@@ -5,7 +5,7 @@ import { catchError, map, of } from "rxjs";
 import { ApiService } from "../api.service";
 
 interface UserInterface {
-    username?: string;
+    user_id?: string;
 }
 
 @Injectable()
@@ -17,10 +17,18 @@ export class AuthService {
         private $api: ApiService,
         private $jwtHelper: JwtHelperService,
       ) {
+        this.loadToken();
+      }
+
+    loadToken() {
+        const token = window.localStorage.getItem(environment.jwt.tokenKey);
+        if (token) {
+          this.validateToken(token);
+        }
       }
 
     isLoggedIn() {
-        return false;
+        return this.user && this.token;
     }
 
     login(form: {username: string; password: string}){
@@ -28,9 +36,15 @@ export class AuthService {
             map( (resp) => {
                 if ( !resp.access_token || !this.validateToken(resp.access_token) ) throw new Error("Invalid username or password.");
                 window.localStorage.setItem(environment.jwt.tokenKey, resp.access_token);
-                console.log(resp);
             } )
         );
+    }
+
+    logout(){
+        this.user = null;
+        this.token = null;
+        window.localStorage.removeItem(environment.jwt.tokenKey);
+        window.location.reload();
     }
 
     register(form: {firstname: string, lastname: string, email: string; password: string}){
@@ -47,7 +61,6 @@ export class AuthService {
         try{
             this.user = this.$jwtHelper.decodeToken(token);
             this.token = token;
-            console.log(this.$jwtHelper.decodeToken(token));
             return true;
         } catch (e) {
             console.log(e);
