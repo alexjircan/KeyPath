@@ -1,7 +1,7 @@
 import { AuthService } from "@/app/core/auth/auth.service";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
     selector: 'app-login',
@@ -15,6 +15,8 @@ export class LoginComponent implements OnInit{
 
     isLoading: boolean = false;
     loginError: boolean = false;
+    public fromRegister: boolean = false;
+    private targetRoute;
 
     public form: FormGroup<{
         username: FormControl<string>;
@@ -24,13 +26,20 @@ export class LoginComponent implements OnInit{
     constructor(
     public $auth: AuthService,
     public $router: Router,
+    public $route: ActivatedRoute,
     ) { }
 
     ngOnInit(): void {
         this.form = new FormGroup({
             username: new FormControl('', [Validators.email, Validators.required]),
             password: new FormControl('', [Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$"), Validators.required]),
-          });
+        });
+
+        this.targetRoute = window.sessionStorage.getItem('target_route') || '';
+
+        this.$route.queryParams.subscribe(params => {
+            this.fromRegister = params['fromregister'];
+        })
     }
 
     onSubmit() {
@@ -46,7 +55,10 @@ export class LoginComponent implements OnInit{
         }
 
         this.$auth.login(this.form.getRawValue()).subscribe(
-            resp => console.log(resp),
+            resp => {
+                this.$router.navigateByUrl(this.targetRoute);
+                window.sessionStorage.removeItem('target_route');
+            },
             err => this.loginError = true,
         ).add( () => this.isLoading = false );
 
