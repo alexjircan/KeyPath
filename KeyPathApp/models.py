@@ -6,7 +6,7 @@ class Users(models.Model):
     UserFirstName = models.CharField(max_length=20, default="")
     UserLastName = models.CharField(max_length=20, default="")
     UserEmail = models.CharField(max_length=20, default="", unique=True)
-    UserPassword = models.CharField(max_length=20, default="")
+    UserPassword = models.CharField(max_length=100, default="")
 
 
 class Accounts(models.Model):

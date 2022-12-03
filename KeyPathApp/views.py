@@ -4,7 +4,7 @@ from django.db.utils import DatabaseError
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
-
+from django.contrib.auth.hashers import make_password, check_password
 from KeyPathApp.models import Users, Accounts
 from KeyPathApp.serializers import UserSerializer, AccountSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -29,7 +29,7 @@ def userLogin(request):
         except Users.DoesNotExist:
             return JsonResponse("Email not found", safe=False)
 
-        if user.UserPassword == json_data["password"]:
+        if check_password(json_data["password"], user.UserPassword):
             refresh = MyTokenObtainPairSerializer.get_token(user)
             return JsonResponse(
                 {
@@ -47,7 +47,7 @@ def userRegister(request):
         try:
             json_data = JSONParser().parse(request)
             user_data = {"UserFirstName": json_data['firstname'], "UserLastName": json_data['lastname'],
-                         "UserPassword": json_data['password'], "UserEmail": json_data['email']}
+                         "UserPassword": make_password(json_data['password']), "UserEmail": json_data['email']}
             users_serializer = UserSerializer(data=user_data)
             if users_serializer.is_valid():
                 users_serializer.save()
