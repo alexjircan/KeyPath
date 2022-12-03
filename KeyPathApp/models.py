@@ -8,3 +8,10 @@ class Users(models.Model):
     UserEmail = models.CharField(max_length=20, default="", unique=True)
     UserPassword = models.CharField(max_length=20, default="")
 
+
+class Accounts(models.Model):
+    AccountId = models.AutoField(primary_key=True)
+    AccountUserName = models.CharField(max_length=20)
+    AccountPassword = models.CharField(max_length=20)
+    AccountUrl = models.CharField(max_length=20)
+

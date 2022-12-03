@@ -5,12 +5,20 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from KeyPathApp.models import Users
-from KeyPathApp.serializers import UserSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from KeyPathApp.models import Users, Accounts
+from KeyPathApp.serializers import UserSerializer, AccountSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-# Create your views here.
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['FirstName'] = user.UserFirstName
+        token['LastName'] = user.UserLastName
+
+        return token
 
 @csrf_exempt
 def userLogin(request):
@@ -22,8 +30,7 @@ def userLogin(request):
             return JsonResponse("Email not found", safe=False)
 
         if user.UserPassword == json_data["password"]:
-            # Generate Token
-            refresh = RefreshToken.for_user(user)
+            refresh = MyTokenObtainPairSerializer.get_token(user)
             return JsonResponse(
                 {
                     'access_token': str(refresh.access_token),
@@ -48,3 +55,23 @@ def userRegister(request):
         except DatabaseError:
             return JsonResponse("Registration failed - duplicated email", safe=False)
         return JsonResponse("Registration failed", safe=False)
+
+@csrf_exempt
+def accountsShow(request):
+    if request.method == 'GET':
+        accounts = Accounts.objects.all()
+        accounts_serializer = AccountSerializer(accounts, many=True)
+        return JsonResponse(accounts_serializer.data, safe=False)
+
+@csrf_exempt
+def accountAdd(request):
+    if request.method == 'POST':
+        json_data = JSONParser().parse(request)
+        account_data = {"AccountUserName": json_data['username'], "AccountPassword": json_data['password'],
+                        "AccountUrl": json_data['url']}
+        accounts_serializer = AccountSerializer(data=account_data)
+        if accounts_serializer.is_valid():
+            accounts_serializer.save()
+            return JsonResponse("Account added successfully", safe=False)
+        else:
+            return JsonResponse("Account add failed", safe=False)
