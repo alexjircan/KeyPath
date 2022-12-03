@@ -10,6 +10,7 @@ import { HomeModule } from './modules/home/home.module';
 import { LoginModule } from './modules/login/login.module';
 import { RegisterModule } from './modules/register/register.module';
 import { LayoutComponent } from './shared/layout/layout.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { LayoutComponent } from './shared/layout/layout.component';
     AuthModule,
     LoginModule,
     RegisterModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

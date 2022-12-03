@@ -15,7 +15,8 @@ export class RegisterComponent implements OnInit{
     @ViewChild('firstname') private firstnameInput;
     @ViewChild('lastname') private lastnameInput;
 
-    isLoading: boolean = false;
+    public isLoading: boolean = false;
+    public registerError: string = '';
     
     checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
         let pass = group.get('password').value;
@@ -77,8 +78,13 @@ export class RegisterComponent implements OnInit{
             lastname: this.form.getRawValue().lastname,
             email: this.form.getRawValue().email,
             password: this.form.getRawValue().password}).subscribe(
-                resp => console.log("ok"),
-                err => console.log(err),
+                resp => this.$router.navigate(['auth/login'], { queryParams: { fromregister: true } }),
+                err => {
+                    if(err == "Registration failed") this.registerError = err;
+                    else this.registerError = "Email already in use!"
+                },
             ).add( () => this.isLoading = false  );
+
+        this.isLoading = true;
     }
 }
