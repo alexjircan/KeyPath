@@ -1,2 +1,18 @@
-Acasa
-!!!!
+<div>
+    <table class="table text-light text-center table-borderless table-hover">
+        <thead>
+			<tr>
+				<th scope="col">Website</th>
+				<th scope="col">Username</th>
+				<th scope="col">Password</th>
+			</tr>
+		</thead>
+		<tbody class="text-light">
+            <tr *ngFor="let account of accounts | async">
+                <td class="text-light">{{account.AccountUserName}}</td>
+                <td class="text-light">{{account.AccountPassword}}</td>
+                <td class="text-light">{{account.AccountUrl}}</td>
+            </tr>
+		</tbody>
+    </table>
+</div>
