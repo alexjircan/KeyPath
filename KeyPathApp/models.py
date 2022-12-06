@@ -11,6 +11,7 @@ class Users(models.Model):
 
 class Accounts(models.Model):
     AccountId = models.AutoField(primary_key=True)
+    AccountUser = models.IntegerField()
     AccountUserName = models.CharField(max_length=20)
     AccountPassword = models.CharField(max_length=20)
     AccountUrl = models.CharField(max_length=20)
