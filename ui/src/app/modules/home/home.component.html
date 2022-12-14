@@ -1,2 +1,42 @@
-Acasa
-!!!!
+<div>
+    <table class="table text-light text-center table-borderless table-hover">
+        <thead>
+			<tr>
+                <th scope="col"></th>
+				<th scope="col" >Website</th>
+				<th scope="col" >Username</th>
+				<th scope="col">Password</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody class="text-light">
+                <tr>
+                    <td style="width:30%"></td>
+                    <td>
+                        <input class="form-control transparent-input text-light rounded-0-right" type="text"/>
+                    </td>
+                    <td>
+                        <input class="form-control transparent-input text-light rounded-0" type="text"/>
+                    </td>
+                    <td>
+                        <input class="form-control transparent-input text-light rounded-0-left" type="text"/>
+                    </td>
+
+                    <td style="width:15%" class="text-start">
+                        <button type="button" class="btn btn-light">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </td>
+                    <td style="width:15%"></td>
+                </tr>
+            <tr *ngFor="let account of accounts | async">
+                <td style="width:30%"></td>
+                <td class="text-light">{{account.AccountUrl}}</td>
+                <td class="text-light">{{account.AccountUserName}}</td>
+                <td class="text-light">{{account.AccountPassword}}</td>
+                <td style="width:30%" colspan="2"></td>
+            </tr>
+		</tbody>
+    </table>
+</div>
