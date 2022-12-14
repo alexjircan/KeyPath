@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'djongo'
 ]
 
 REST_FRAMEWORK = {
@@ -150,6 +151,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Emailing settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_FROM = 'cojocaruvicentiu25@gmail.com'
+EMAIL_HOST_USER = 'cojocaruvicentiu25@gmail.com'
+EMAIL_HOST_PASSWORD = 'pdswrretbtwflimq'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

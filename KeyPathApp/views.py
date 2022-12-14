@@ -1,4 +1,5 @@
 import jwt
+from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import DatabaseError
 from rest_framework import status
@@ -33,6 +34,17 @@ def checkToken(request):
         return 'Invalid token'
 
 
+def activateEmail(to_email):
+    mail_subject = "Activate your user account."
+    message = "Abc"
+    email = EmailMessage(mail_subject, message, to={to_email})
+    if email.send():
+        return "success"
+    else:
+        return "fail"
+
+
+
 @csrf_exempt
 def userLogin(request):
     if request.method == 'POST':
@@ -53,6 +65,8 @@ def userLogin(request):
             )
         else:
             return JsonResponse("Password incorrect", safe=False)
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
 
 
 @csrf_exempt
@@ -61,14 +75,34 @@ def userRegister(request):
         try:
             json_data = JSONParser().parse(request)
             user_data = {"UserFirstName": json_data['firstname'], "UserLastName": json_data['lastname'],
-                         "UserPassword": make_password(json_data['password']), "UserEmail": json_data['email']}
+                         "UserPassword": make_password(json_data['password']), "UserEmail": json_data['email'],
+                         "UserAccounts": []}
             users_serializer = UserSerializer(data=user_data)
             if users_serializer.is_valid():
                 users_serializer.save()
+                activateEmail(json_data['email'])
                 return JsonResponse("Registration success", safe=False)
         except DatabaseError:
             return JsonResponse("Registration failed - duplicated email", safe=False)
         return JsonResponse("Registration failed", safe=False)
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
+
+@csrf_exempt
+def userShow(request):
+    if request.method == 'GET':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        user = Users.objects.get(UserId=token)
+        data = {
+            'firstname': user.UserFirstName,
+            'lastname': user.UserLastName,
+            'email': user.UserEmail
+        }
+        return JsonResponse(data, safe=False)
+    else:
+        return JsonResponse("GET REQUEST!", safe=False)
 
 
 @csrf_exempt
@@ -77,9 +111,13 @@ def accountsShow(request):
         token = checkToken(request)
         if token == 'Invalid token' or token == 'Missing token':
             return JsonResponse(token, safe=False)
-        accounts = Accounts.objects.filter(AccountUser=token)
-        accounts_serializer = AccountSerializer(accounts, many=True)
-        return JsonResponse(accounts_serializer.data, safe=False)
+        accounts = Users.objects.get(UserId=token)
+        data = {
+            'accounts': accounts.UserAccounts
+        }
+        return JsonResponse(data, safe=False)
+    else:
+        return JsonResponse("GET REQUEST!", safe=False)
 
 
 @csrf_exempt
@@ -89,11 +127,23 @@ def accountAdd(request):
         if token == 'Invalid token' or token == 'Missing token':
             return JsonResponse(token, safe=False)
         json_data = JSONParser().parse(request)
-        account_data = {"AccountUserName": json_data['username'], "AccountUser": token,
-                        "AccountPassword": json_data['password'], "AccountUrl": json_data['url']}
-        accounts_serializer = AccountSerializer(data=account_data)
-        if accounts_serializer.is_valid():
-            accounts_serializer.save()
+        user = Users.objects.get(UserId=token)
+        new_account = {
+            "id": len(user.UserAccounts),
+            "AccountUserName": json_data['username'],
+            "AccountPassword": json_data['password'],
+            "AccountUrl": json_data['url']
+        }
+        new_account_serialized = AccountSerializer(data=new_account)
+        if new_account_serialized.is_valid():
+            user.UserAccounts.extend([new_account_serialized.data])
+            user.save()
             return JsonResponse("Account added successfully", safe=False)
         else:
-            return JsonResponse("Account add failed", safe=False)
+            return JsonResponse("Account failed to add", safe=False)
+
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
+
+
+
