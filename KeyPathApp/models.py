@@ -14,6 +14,6 @@ class Users(models.Model):
     UserLastName = models.CharField(max_length=20, default="")
     UserEmail = models.CharField(max_length=40, default="", unique=True)
     UserPassword = models.CharField(max_length=100, default="")
-    UserAccounts = models.ArrayField(
-        model_container=Accounts,
-    )
+    UserAccounts = models.ArrayField(model_container=Accounts, )
+    UserToken = models.CharField(max_length=64, default="")
+    UserIsActive = models.IntegerField(default=0)

@@ -1,4 +1,5 @@
 import jwt
+import secrets
 from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import DatabaseError
@@ -34,15 +35,15 @@ def checkToken(request):
         return 'Invalid token'
 
 
-def activateEmail(to_email):
-    mail_subject = "Activate your user account."
-    message = "Abc"
+def activateEmail(to_email, name, token):
+    mail_subject = "Activate your user account"
+    message = "Hello " + name + ",\n\nPlease click on the link below to confirm your registration:\n\n" + \
+              "http://localhost:4200/confirm-email?token=" + token
     email = EmailMessage(mail_subject, message, to={to_email})
     if email.send():
         return "success"
     else:
         return "fail"
-
 
 
 @csrf_exempt
@@ -76,17 +77,20 @@ def userRegister(request):
             json_data = JSONParser().parse(request)
             user_data = {"UserFirstName": json_data['firstname'], "UserLastName": json_data['lastname'],
                          "UserPassword": make_password(json_data['password']), "UserEmail": json_data['email'],
-                         "UserAccounts": []}
+                         "UserAccounts": [], "UserToken": secrets.token_hex(32)}
             users_serializer = UserSerializer(data=user_data)
             if users_serializer.is_valid():
                 users_serializer.save()
-                activateEmail(json_data['email'])
-                return JsonResponse("Registration success", safe=False)
+                if activateEmail(json_data['email'], user_data["UserFirstName"], user_data["UserToken"]) == "success":
+                    return JsonResponse("Registration success", safe=False)
+                else:
+                    return JsonResponse("Registration failed - email not sent", safe=False)
         except DatabaseError:
             return JsonResponse("Registration failed - duplicated email", safe=False)
         return JsonResponse("Registration failed", safe=False)
     else:
         return JsonResponse("POST REQUEST!", safe=False)
+
 
 @csrf_exempt
 def userShow(request):
@@ -101,6 +105,22 @@ def userShow(request):
             'email': user.UserEmail
         }
         return JsonResponse(data, safe=False)
+    else:
+        return JsonResponse("GET REQUEST!", safe=False)
+
+
+@csrf_exempt
+def userConfirmEmail(request):
+    if request.method == 'GET':
+        token = request.GET.get('token', None)
+        try:
+            user = Users.objects.get(UserToken=token)
+        except Users.DoesNotExist:
+            return JsonResponse("Activation Failed - invalid token", safe=False)
+        user.UserToken = ""
+        user.UserIsActive = 1
+        user.save()
+        return JsonResponse("Activation Succeeded", safe=False)
     else:
         return JsonResponse("GET REQUEST!", safe=False)
 
@@ -144,6 +164,3 @@ def accountAdd(request):
 
     else:
         return JsonResponse("POST REQUEST!", safe=False)
-
-
-

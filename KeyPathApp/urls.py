@@ -8,4 +8,5 @@ urlpatterns = [
     re_path(r'^account/getAll$', views.accountsShow),
     re_path(r'^account/add$', views.accountAdd),
     re_path(r'^user/details$', views.userShow),
+    re_path(r'^user/confirm-email$', views.userConfirmEmail),
 ]

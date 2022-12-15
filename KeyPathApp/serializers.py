@@ -5,7 +5,8 @@ from KeyPathApp.models import Users, Accounts
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = ('UserId', 'UserFirstName', 'UserLastName', 'UserPassword', 'UserEmail', 'UserAccounts')
+        fields = ('UserId', 'UserFirstName', 'UserLastName', 'UserPassword', 'UserEmail', 'UserAccounts', 'UserToken',
+                  'UserIsActive')
 
 
 class AccountSerializer(serializers.ModelSerializer):
