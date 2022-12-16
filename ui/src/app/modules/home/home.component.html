@@ -1,42 +1,80 @@
 <div>
-    <table class="table text-light text-center table-borderless table-hover">
-        <thead>
-			<tr>
-                <th scope="col"></th>
-				<th scope="col" >Website</th>
-				<th scope="col" >Username</th>
-				<th scope="col">Password</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-			</tr>
-		</thead>
-		<tbody class="text-light">
+    <form [formGroup] = "form" (ngSubmit)="addAccount()">
+        <table class="table text-light text-center table-borderless table-hover">
+            <thead>
                 <tr>
-                    <td style="width:30%"></td>
-                    <td>
-                        <input class="form-control transparent-input text-light rounded-0-right" type="text"/>
-                    </td>
-                    <td>
-                        <input class="form-control transparent-input text-light rounded-0" type="text"/>
-                    </td>
-                    <td>
-                        <input class="form-control transparent-input text-light rounded-0-left" type="text"/>
-                    </td>
+                    <th scope="col"></th>
+                    <th scope="col" >Website</th>
+                    <th scope="col" >Username</th>
+                    <th scope="col">Password</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody class="text-light">
+                    <tr>
+                        <td style="width:30%"></td>
+                        <td>
+                            <input 
+                                formControlName="website"  
+                                class="form-control transparent-input text-light rounded-0-right" 
+                                type="text"
+                                [ngClass]="{ 'is-invalid': form.get('website').invalid && form.get('website').touched }"
+                                />
+                        </td>
+                        <td>
+                            <input 
+                                formControlName="username" 
+                                class="form-control transparent-input text-light rounded-0" 
+                                type="text"
+                                [ngClass]="{ 'is-invalid': form.get('username').invalid && form.get('username').touched }"
+                                />
+                        </td>
+                        <td>
+                            <input 
+                                formControlName="password" 
+                                class="form-control transparent-input text-light rounded-0-left" 
+                                type="password"
+                                [ngClass]="{ 'is-invalid': form.get('password').invalid && form.get('password').touched }"
+                                />
+                        </td>
 
+                        <td style="width:15%" class="text-start">
+                            <div *ngIf="isLoading == false; else loading">
+                                <button type="submit" [disabled]="form.invalid" class="btn btn-light">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <ng-template #loading>
+                                <div>
+                                    <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+                                </div>
+                            </ng-template>
+                        </td>
+                        <td style="width:15%"></td>
+                    </tr>
+                <tr *ngFor="let account of accounts | async">
+                    <td style="width:30%"></td>
+                    <td class="text-light">
+                        <div class="d-flex justify-content-center">
+                            <img [src]="getUrlImage(account.AccountUrl)" onerror="this.src = 'assets/defaultWebIcon.png'" alt="" width="25">
+                            <div class="px-1">
+                                <a class="link-light text-decoration-none" [href]="getValidUrl(account.AccountUrl)">
+                                    {{account.AccountUrl}}
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-light">{{account.AccountUserName}}</td>
+                    <td class="text-light">{{account.AccountPassword}}</td>
                     <td style="width:15%" class="text-start">
-                        <button type="button" class="btn btn-light">
-                            <i class="fa-solid fa-plus"></i>
+                        <button type="button" class="btn btn-danger text-dark" (click)="deleteAccount(account)">
+                            <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
                     <td style="width:15%"></td>
                 </tr>
-            <tr *ngFor="let account of accounts | async">
-                <td style="width:30%"></td>
-                <td class="text-light">{{account.AccountUrl}}</td>
-                <td class="text-light">{{account.AccountUserName}}</td>
-                <td class="text-light">{{account.AccountPassword}}</td>
-                <td style="width:30%" colspan="2"></td>
-            </tr>
-		</tbody>
-    </table>
+            </tbody>
+        </table>
+    </form>
 </div>

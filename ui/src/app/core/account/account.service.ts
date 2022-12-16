@@ -1,5 +1,6 @@
+import { HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, map, Observable } from "rxjs";
 import { ApiService } from "../api.service";
 import { Account } from "./account";
 
@@ -7,19 +8,27 @@ import { Account } from "./account";
     providedIn: 'root',
 })
 export class AccountService{
-    private _accounts = new BehaviorSubject<Account[]>([]);
-
     constructor(
         private $api: ApiService,
-    ){
-        this.$api.get("/account/getAll").subscribe(
-            (result) => {
-                this._accounts.next(result);
-            }
-        );
+    ){}
+
+    addAccount(form: {website: string, username: string, password: string}){
+        let formAux = {
+            username: form.username,
+            password: form.password,
+            url: form.website
+        }
+        return this.$api.post('/account/add', formAux);
     }
 
-    get accounts() {
-        return this._accounts;
+    getValidUrl(url: string){
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url =  'http://' + url;
+        }
+        return url + "/favicon.ico";
+    }
+
+    getAccounts(): Observable<Account[]> {
+        return this.$api.get("/account/getAll");
     }
 }
