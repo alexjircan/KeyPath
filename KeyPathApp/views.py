@@ -1,11 +1,15 @@
 import jwt
 import secrets
+
+from django.db.models import Q
+from djongo import models
+import requests
 from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
 from django.db.utils import DatabaseError
 from rest_framework import status
 from rest_framework.parsers import JSONParser
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
 from KeyPathApp.models import Users, Accounts
 from KeyPathApp.serializers import UserSerializer, AccountSerializer
@@ -164,3 +168,30 @@ def accountAdd(request):
 
     else:
         return JsonResponse("POST REQUEST!", safe=False)
+
+@csrf_exempt
+def accountDelete(request):
+    if request.method == 'DELETE':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        json_data = JSONParser().parse(request)
+        account = Users.objects.filter(Q(UserAccounts__id=json_data["id"])).values_list('UserAccounts')[0][0]
+        Users.objects.get(UserId=token).UserAccounts.remove(account)
+    else:
+        return JsonResponse("DELETE REQUEST!", safe=False)
+
+@csrf_exempt
+def accountIcon(request):
+    if request.method == 'GET':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        json_data = JSONParser().parse(request)
+        image_data = requests.get(json_data["url"])
+        response = HttpResponse(image_data, content_type="image/png")
+        response['Content-Disposition'] = 'attachment; filename="image.png"'
+        return response
+    else:
+        return JsonResponse("GET REQUEST!", safe=False)
+
