@@ -1,7 +1,7 @@
 import jwt
 import secrets
 
-from django.db.models import Q
+from django.db.models import Q, F
 from djongo import models
 import requests
 from django.core.mail import EmailMessage
@@ -43,6 +43,17 @@ def activateEmail(to_email, name, token):
     mail_subject = "Activate your user account"
     message = "Hello " + name + ",\n\nPlease click on the link below to confirm your registration:\n\n" + \
               "http://localhost:4200/confirm-email?token=" + token
+    email = EmailMessage(mail_subject, message, to={to_email})
+    if email.send():
+        return "success"
+    else:
+        return "fail"
+
+
+def resetEmail(to_email, name, token):
+    mail_subject = "Reset your password"
+    message = "Hello " + name + ",\n\nPlease click on the link below to reset your password:\n\n" + \
+              "http://localhost:4200/reset-password?token=" + token
     email = EmailMessage(mail_subject, message, to={to_email})
     if email.send():
         return "success"
@@ -130,6 +141,40 @@ def userConfirmEmail(request):
 
 
 @csrf_exempt
+def userResetPassword(request):
+    if request.method == 'PATCH':
+        token = request.GET.get('token', None)
+        try:
+            user = Users.objects.get(UserToken=token)
+        except Users.DoesNotExist:
+            return JsonResponse("Reset Failed - invalid token", safe=False)
+        json_data = JSONParser().parse(request)
+        user.UserToken = ""
+        user.UserPassword = make_password(json_data['password'])
+        user.save()
+        return JsonResponse("Reset Succeeded", safe=False)
+    else:
+        return JsonResponse("PATCH REQUEST!", safe=False)
+
+@csrf_exempt
+def userSendResetEmail(request):
+    if request.method == 'POST':
+        json_data = JSONParser().parse(request)
+        try:
+            user = Users.objects.get(UserEmail=json_data['email'])
+        except Users.DoesNotExist:
+            return JsonResponse("Send Failed - invalid email", safe=False)
+        token = secrets.token_hex(32)
+        if resetEmail(json_data['email'], user.UserFirstName, token) == "success":
+            user.UserToken = token
+            user.save()
+            return JsonResponse("Sent email", safe=False)
+        else:
+            return JsonResponse("Send Failed", safe=False)
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
+
+@csrf_exempt
 def accountsShow(request):
     if request.method == 'GET':
         token = checkToken(request)
@@ -176,8 +221,15 @@ def accountDelete(request):
         if token == 'Invalid token' or token == 'Missing token':
             return JsonResponse(token, safe=False)
         json_data = JSONParser().parse(request)
-        account = Users.objects.filter(Q(UserAccounts__id=json_data["id"])).values_list('UserAccounts')[0][0]
-        Users.objects.get(UserId=token).UserAccounts.remove(account)
+        accounts = [account for account in Users.objects.get(UserId=token).UserAccounts if
+                    account['id'] == json_data["id"]]
+        user = Users.objects.get(UserId=token)
+        if len(accounts) == 1:
+            user.UserAccounts.remove(accounts[0])
+            user.save()
+            return JsonResponse("Account deleted", safe=False)
+        else:
+            return JsonResponse("Delete failed", safe=False)
     else:
         return JsonResponse("DELETE REQUEST!", safe=False)
 
