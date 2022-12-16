@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from "rxjs";
 import { environment } from "@/environments/environment";
 
@@ -11,6 +11,10 @@ export class ApiService{
 
     get(url: string, options?): Observable<any> {
         return this.$http.get(`${environment.api.base}${url}`, options);
+    }
+
+    getRaw(url: string, options?): Observable<any> {
+        return this.$http.get(`${url}`, options);
     }
 
     post(url: string, body: any | null, options?): Observable<any> {
