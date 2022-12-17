@@ -1,8 +1,6 @@
 import jwt
 import secrets
 
-from django.db.models import Q, F
-from djongo import models
 import requests
 from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +9,9 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
-from KeyPathApp.models import Users, Accounts
+from rest_framework_simplejwt.tokens import  UntypedToken
+
+from KeyPathApp.models import Users
 from KeyPathApp.serializers import UserSerializer, AccountSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.conf import settings
@@ -75,7 +75,7 @@ def userLogin(request):
             return JsonResponse(
                 {
                     'access_token': str(refresh.access_token),
-                    # 'refresh_token': str(refresh)
+                    'refresh_token': str(refresh)
                 }
                 , status=status.HTTP_200_OK
             )
@@ -123,6 +123,31 @@ def userShow(request):
     else:
         return JsonResponse("GET REQUEST!", safe=False)
 
+
+@csrf_exempt
+def refreshToken(request):
+    if request.method == 'POST':
+        json_data = JSONParser().parse(request)
+        old_refresh = json_data["refresh_token"]
+        try:
+            UntypedToken(old_refresh)
+            decoded_refresh = jwt.decode(old_refresh, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id = decoded_refresh.get('user_id')
+            user = Users.objects.get(UserId=user_id)
+        except Exception:
+            return JsonResponse("invalid token", safe=False)
+        if user is None or decoded_refresh.get('token_type') != "refresh":
+            return JsonResponse("invalid token", safe=False)
+        refresh = MyTokenObtainPairSerializer.get_token(user)
+        return JsonResponse(
+            {
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh)
+            }
+            , status=status.HTTP_200_OK
+        )
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
 
 @csrf_exempt
 def userConfirmEmail(request):
