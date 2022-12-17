@@ -31,12 +31,17 @@
                                 />
                         </td>
                         <td>
-                            <input 
-                                formControlName="password" 
-                                class="form-control transparent-input text-light rounded-0-left" 
-                                type="password"
-                                [ngClass]="{ 'is-invalid': form.get('password').invalid && form.get('password').touched }"
-                                />
+                            <div class="input-group">
+                                <input 
+                                    formControlName="password" 
+                                    class="form-control transparent-input text-light rounded-0-left" 
+                                    [type]="passwordIcon == faEyeSlash ? 'password' : 'text'"
+                                    [ngClass]="{ 'is-invalid': form.get('password').invalid && form.get('password').touched }"
+                                    />
+                                <button type="button" class="btn btn-outline-light" (click)="hidePassword()">
+                                    <fa-icon [icon]="passwordIcon"></fa-icon>
+                                </button>
+                            </div>
                         </td>
 
                         <td style="width:15%" class="text-start">
@@ -53,27 +58,49 @@
                         </td>
                         <td style="width:15%"></td>
                     </tr>
-                <tr *ngFor="let account of accounts | async">
-                    <td style="width:30%"></td>
-                    <td class="text-light">
-                        <div class="d-flex justify-content-center">
-                            <img [src]="getUrlImage(account.AccountUrl)" onerror="this.src = 'assets/defaultWebIcon.png'" alt="" width="25">
-                            <div class="px-1">
-                                <a class="link-light text-decoration-none" [href]="getValidUrl(account.AccountUrl)">
-                                    {{account.AccountUrl}}
-                                </a>
+                <ng-template #tableloading>
+                    <tr>
+                        <td colspan="6">
+                            <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+                        </td>
+                    </tr>          
+                </ng-template>
+                <ng-container *ngIf="!this.isTableLoading; else tableloading">
+                    <tr *ngFor="let account of accounts | async">
+                        <td style="width:30%"></td>
+                        <td class="text-light align-middle">
+                            <div class="d-flex justify-content-center">
+                                <img [src]="account.validImgUrl" width="25">
+                                <div class="px-1">
+                                    <a class="link-light text-decoration-none" [href]="">
+                                        {{account.AccountUrl}}
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="text-light">{{account.AccountUserName}}</td>
-                    <td class="text-light">{{account.AccountPassword}}</td>
-                    <td style="width:15%" class="text-start">
-                        <button type="button" class="btn btn-danger text-dark" (click)="deleteAccount(account)">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                    <td style="width:15%"></td>
-                </tr>
+                        </td>
+                        <td class="text-light align-middle">    
+                            {{account.AccountUserName}}
+                        </td>
+                        <td class="text-light">
+                            <div class="input-group">
+                            <input 
+                                class="form-control text-center transparent-input text-light border-0"
+                                readonly
+                                [type]="account.showPassword === false ? 'password' : 'text'" 
+                                value="{{ account.AccountPassword }}">
+                            <button type="button" class="btn" (click)="account.showPassword = !account.showPassword">
+                                <fa-icon [icon]="account.showPassword ? faEye : faEyeSlash"></fa-icon>
+                            </button>
+                            </div>
+                        </td>
+                        <td style="width:15%" class="text-start">
+                            <button type="button" class="btn btn-danger text-dark" (click)="deleteAccount(account)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                        <td style="width:15%"></td>
+                    </tr>
+                </ng-container>
             </tbody>
         </table>
     </form>

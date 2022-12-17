@@ -12,6 +12,7 @@ import { RegisterModule } from './modules/register/register.module';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [

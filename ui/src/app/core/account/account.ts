@@ -3,5 +3,6 @@ export interface Account {
 	AccountUserName: string;
 	AccountPassword: string;
 	AccountUrl: string;
-	validImgUrl: string;
+	validImgUrl?: string;
+	showPassword?: boolean;
 }

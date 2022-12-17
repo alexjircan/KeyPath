@@ -1,9 +1,12 @@
 import { Account } from "@/app/core/account/account";
 import { AccountService } from "@/app/core/account/account.service";
 import { ApiService } from "@/app/core/api.service";
+import { User } from "@/app/core/user";
 import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { Observable } from "rxjs";
+import { faEyeSlash, faStar } from "@fortawesome/free-regular-svg-icons";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { filter, map, Observable, tap } from "rxjs";
 
 @Component({
     selector: "app-home",
@@ -11,9 +14,14 @@ import { Observable } from "rxjs";
     styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit{
+    faEye = faEye;
+    faEyeSlash = faEyeSlash;
+
     public accounts: Observable<Account[]>;
 
     public isLoading: boolean = false;
+    public isTableLoading: boolean = false;
+    public passwordIcon = faEyeSlash;
 
     public form = new FormGroup({
         website: new FormControl('', Validators.required),
@@ -25,27 +33,36 @@ export class HomeComponent implements OnInit{
         public $accountService: AccountService,
         public $api: ApiService
     ){
-        this.accounts = $accountService.getAccounts();
+        this.accounts = $accountService.getAccounts().pipe(
+            map( accounts => {
+                accounts.forEach( account => account.showPassword = false )
+                console.log(accounts);
+                return accounts;
+            } )
+        );
     }
 
     ngOnInit(): void {
+        
+    }
 
+    hidePassword() {
+        if( this.passwordIcon == faEye ){
+            this.passwordIcon = faEyeSlash;
+        }
+        else{
+            this.passwordIcon = faEye;
+        }
     }
 
     deleteAccount(account: Account) {
-        console.log(account.AccountUserName);
-    }
-
-    getValidUrl(url: string){
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url =  'http://' + url;
-        }
-        return url;
-    }
-
-    getUrlImage(url: string){
-        url = this.getValidUrl(url);
-        return url + "/favicon.ico";
+        this.$accountService.deleteAccount({id: account.id}).subscribe(
+            (resp) => {
+                console.log(resp);
+                this.isTableLoading = false;
+            }
+        )
+        this.isTableLoading = true;
     }
 
     addAccount() {
