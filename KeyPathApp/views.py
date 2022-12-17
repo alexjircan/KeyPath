@@ -174,6 +174,22 @@ def userSendResetEmail(request):
     else:
         return JsonResponse("POST REQUEST!", safe=False)
 
+
+@csrf_exempt
+def userChangePassword(request):
+    if request.method == 'PATCH':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        json_data = JSONParser().parse(request)
+        user = Users.objects.get(UserId=token)
+        user.UserPassword = make_password(json_data["password"])
+        user.save()
+        return JsonResponse("Password changed", safe=False)
+    else:
+        return JsonResponse("PATCH REQUEST!", safe=False)
+
+
 @csrf_exempt
 def accountsShow(request):
     if request.method == 'GET':
@@ -232,6 +248,37 @@ def accountDelete(request):
             return JsonResponse("Delete failed", safe=False)
     else:
         return JsonResponse("DELETE REQUEST!", safe=False)
+
+
+@csrf_exempt
+def accountUpdate(request):
+    if request.method == 'PUT':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        json_data = JSONParser().parse(request)
+        user = Users.objects.get(UserId=token)
+        accounts = [account for account in user.UserAccounts if
+                    account['id'] == json_data["id"]]
+        if len(accounts) == 1:
+            user.UserAccounts.remove(accounts[0])
+            new_account = {
+                "id": json_data["id"],
+                "AccountUserName": json_data['AccountUserName'],
+                "AccountPassword": json_data['AccountPassword'],
+                "AccountUrl": json_data['AccountUrl']
+            }
+            new_account_serialized = AccountSerializer(data=new_account)
+            if new_account_serialized.is_valid():
+                user.UserAccounts.extend([new_account_serialized.data])
+                user.save()
+                return JsonResponse("Account updated successfully", safe=False)
+            else:
+                return JsonResponse("Account failed to update", safe=False)
+        else:
+            return JsonResponse("Account failed to update", safe=False)
+    else:
+        return JsonResponse("PUT REQUEST!", safe=False)
 
 @csrf_exempt
 def accountIcon(request):
