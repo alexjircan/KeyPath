@@ -213,8 +213,11 @@ def accountAdd(request):
             return JsonResponse(token, safe=False)
         json_data = JSONParser().parse(request)
         user = Users.objects.get(UserId=token)
+        user_id = 0
+        if len(user.UserAccounts) > 0:
+            user_id = user.UserAccounts[len(user.UserAccounts) - 1]["id"] + 1
         new_account = {
-            "id": len(user.UserAccounts),
+            "id": user_id,
             "AccountUserName": json_data['username'],
             "AccountPassword": json_data['password'],
             "AccountUrl": json_data['url']
