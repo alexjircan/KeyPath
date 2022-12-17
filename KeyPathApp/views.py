@@ -238,8 +238,11 @@ def accountIcon(request):
     if request.method == 'GET':
         url = request.GET.get('url', None)
         image_data = requests.get(url)
-        response = HttpResponse(image_data, content_type="image/png")
-        return response
+        if image_data.apparent_encoding is None:
+            response = HttpResponse(image_data, content_type="image/png")
+            return response
+        else:
+            return JsonResponse("Failed to get an image", safe=False)
     else:
         return JsonResponse("GET REQUEST!", safe=False)
 
