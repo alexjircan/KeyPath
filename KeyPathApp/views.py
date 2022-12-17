@@ -236,13 +236,9 @@ def accountDelete(request):
 @csrf_exempt
 def accountIcon(request):
     if request.method == 'GET':
-        token = checkToken(request)
-        if token == 'Invalid token' or token == 'Missing token':
-            return JsonResponse(token, safe=False)
         url = request.GET.get('url', None)
         image_data = requests.get(url)
         response = HttpResponse(image_data, content_type="image/png")
-        response['Content-Disposition'] = 'attachment; filename="image.png"'
         return response
     else:
         return JsonResponse("GET REQUEST!", safe=False)
