@@ -16,6 +16,8 @@ from KeyPathApp.serializers import UserSerializer, AccountSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.conf import settings
 
+BLACKLIST_TOKENS = set()
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -34,6 +36,8 @@ def checkToken(request):
         if token is None:
             return 'Missing token'
         decoded = jwt.decode(token[7:], settings.SECRET_KEY, algorithms=["HS256"])
+        if token in BLACKLIST_TOKENS:
+            return 'Invalid token'
         return decoded.get('user_id')
     except Exception as ex:
         return 'Invalid token'
@@ -70,6 +74,9 @@ def userLogin(request):
         except Users.DoesNotExist:
             return JsonResponse("Email not found", safe=False)
 
+        if user.UserIsActive == 0:
+            return JsonResponse("Email not confirmed", safe=False)
+
         if check_password(json_data["password"], user.UserPassword):
             refresh = MyTokenObtainPairSerializer.get_token(user)
             return JsonResponse(
@@ -81,6 +88,19 @@ def userLogin(request):
             )
         else:
             return JsonResponse("Password incorrect", safe=False)
+    else:
+        return JsonResponse("POST REQUEST!", safe=False)
+
+
+@csrf_exempt
+def userLogOut(request):
+    if request.method == 'POST':
+        token = checkToken(request)
+        if token == 'Invalid token' or token == 'Missing token':
+            return JsonResponse(token, safe=False)
+        token = request.META.get('HTTP_AUTHORIZATION')
+        BLACKLIST_TOKENS.add(token)
+        return JsonResponse("User was successfully logged out", safe=False)
     else:
         return JsonResponse("POST REQUEST!", safe=False)
 
