@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse, HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
-from rest_framework_simplejwt.tokens import  UntypedToken
+from rest_framework_simplejwt.tokens import UntypedToken
 
 from KeyPathApp.models import Users
 from KeyPathApp.serializers import UserSerializer, AccountSerializer
@@ -17,6 +17,37 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.conf import settings
 
 BLACKLIST_TOKENS = set()
+
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class EmailSender(metaclass=Singleton):
+    def send_registration_email(self, to_email, name, token):
+        mail_subject = "Activate your user account"
+        message = "Hello " + name + ",\n\nPlease click on the link below to confirm your registration:\n\n" + \
+                  "http://localhost:4200/confirm-email?token=" + token
+        email = EmailMessage(mail_subject, message, to={to_email})
+        if email.send():
+            return "success"
+        else:
+            return "fail"
+
+    def send_reset_email(self, to_email, name, token):
+        mail_subject = "Reset your password"
+        message = "Hello " + name + ",\n\nPlease click on the link below to reset your password:\n\n" + \
+                  "http://localhost:4200/reset-password?token=" + token
+        email = EmailMessage(mail_subject, message, to={to_email})
+        if email.send():
+            return "success"
+        else:
+            return "fail"
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -41,28 +72,6 @@ def checkToken(request):
         return decoded.get('user_id')
     except Exception as ex:
         return 'Invalid token'
-
-
-def activateEmail(to_email, name, token):
-    mail_subject = "Activate your user account"
-    message = "Hello " + name + ",\n\nPlease click on the link below to confirm your registration:\n\n" + \
-              "http://localhost:4200/confirm-email?token=" + token
-    email = EmailMessage(mail_subject, message, to={to_email})
-    if email.send():
-        return "success"
-    else:
-        return "fail"
-
-
-def resetEmail(to_email, name, token):
-    mail_subject = "Reset your password"
-    message = "Hello " + name + ",\n\nPlease click on the link below to reset your password:\n\n" + \
-              "http://localhost:4200/reset-password?token=" + token
-    email = EmailMessage(mail_subject, message, to={to_email})
-    if email.send():
-        return "success"
-    else:
-        return "fail"
 
 
 @csrf_exempt
@@ -116,7 +125,8 @@ def userRegister(request):
             users_serializer = UserSerializer(data=user_data)
             if users_serializer.is_valid():
                 users_serializer.save()
-                if activateEmail(json_data['email'], user_data["UserFirstName"], user_data["UserToken"]) == "success":
+                email_sender = EmailSender()
+                if email_sender.send_registration_email(json_data['email'], user_data["UserFirstName"], user_data["UserToken"]) == "success":
                     return JsonResponse("Registration success", safe=False)
                 else:
                     return JsonResponse("Registration failed - email not sent", safe=False)
@@ -169,6 +179,7 @@ def refreshToken(request):
     else:
         return JsonResponse("POST REQUEST!", safe=False)
 
+
 @csrf_exempt
 def userConfirmEmail(request):
     if request.method == 'GET':
@@ -201,6 +212,7 @@ def userResetPassword(request):
     else:
         return JsonResponse("PATCH REQUEST!", safe=False)
 
+
 @csrf_exempt
 def userSendResetEmail(request):
     if request.method == 'POST':
@@ -210,7 +222,8 @@ def userSendResetEmail(request):
         except Users.DoesNotExist:
             return JsonResponse("Send Failed - invalid email", safe=False)
         token = secrets.token_hex(32)
-        if resetEmail(json_data['email'], user.UserFirstName, token) == "success":
+        email_sender = EmailSender()
+        if email_sender.send_reset_email(json_data['email'], user.UserFirstName, token) == "success":
             user.UserToken = token
             user.save()
             return JsonResponse("Sent email", safe=False)
@@ -278,6 +291,7 @@ def accountAdd(request):
     else:
         return JsonResponse("POST REQUEST!", safe=False)
 
+
 @csrf_exempt
 def accountDelete(request):
     if request.method == 'DELETE':
@@ -328,6 +342,7 @@ def accountUpdate(request):
     else:
         return JsonResponse("PUT REQUEST!", safe=False)
 
+
 @csrf_exempt
 def accountIcon(request):
     if request.method == 'GET':
@@ -343,4 +358,3 @@ def accountIcon(request):
             return JsonResponse("Failed to get an image", safe=False)
     else:
         return JsonResponse("GET REQUEST!", safe=False)
-
