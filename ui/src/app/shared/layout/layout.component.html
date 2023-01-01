@@ -11,13 +11,18 @@
                 <ul class="navbar-nav px-3">
                     <li class="nav-item" ngbDropdo>
                         <div ngbDropdown class="d-inline-block" placement="bottom-right" display="dynamic">
-                            <button type="button" class="btn btn-dark" id="dropdownBasic1" ngbDropdownToggle>
-                                <i class="fa-lg fa-solid fa-user"></i>
-                            </button>
-                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                <button ngbDropdownItem>Action - 1</button>
-                                <button ngbDropdownItem>Another Action</button>
-                                <button (click)="onLogout()" ngbDropdownItem>Logout</button>
+                            <div *ngIf="(user$ | async) as user" class="text-light d-inline-block px-2 align-middle">
+                                {{ "Hi, " + user.firstname + " " + user.lastname + "!" }}
+                            </div>
+                            <div class="d-inline-block">
+                                <button type="button" class="btn btn-dark" id="dropdownBasic1" ngbDropdownToggle>
+                                    <i class="fa-lg fa-solid fa-user"></i>
+                                </button>
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                    <a class="btn" (click)="this.$router.navigate([''])" ngbDropdownItem>Home</a>
+                                    <button (click)="this.$router.navigate(['/details'])" ngbDropdownItem>Account Details</button>
+                                    <button (click)="onLogout()" ngbDropdownItem>Logout</button>
+                                </div>
                             </div>
                         </div>
                     </li>

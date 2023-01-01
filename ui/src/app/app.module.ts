@@ -12,6 +12,9 @@ import { RegisterModule } from './modules/register/register.module';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DetailsModule } from './modules/details/details.module';
 
 @NgModule({
   declarations: [
@@ -23,11 +26,13 @@ import { CommonModule } from '@angular/common';
     BrowserModule,
     AppRoutingModule,
     HomeModule,
+    DetailsModule,
     AuthModule,
     LoginModule,
     RegisterModule,
     HttpClientModule,
-    NgbModule
+    NgbModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
