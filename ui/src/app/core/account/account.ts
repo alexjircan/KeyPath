@@ -1,3 +1,5 @@
+import { IZXCVBNResult } from "zxcvbn-typescript";
+
 export interface Account {
 	id: number;
 	AccountUserName: string;
@@ -5,4 +7,7 @@ export interface Account {
 	AccountUrl: string;
 	validImgUrl?: string;
 	showPassword?: boolean;
+	passwordStrength?: IZXCVBNResult;
+	editLoading?: boolean;
+	editable?: boolean;
 }

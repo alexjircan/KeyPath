@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/auth/auth.guard';
 import { AuthComponent } from './modules/auth/auth.component';
+import { DetailsComponent } from './modules/details/details.component';
 import { HomeComponent } from './modules/home/home.component';
 import { LoginComponent } from './modules/login/login.component';
 import { LoginGuard } from './modules/login/login.guard';
@@ -39,6 +40,10 @@ const routes: Routes = [
       {
         path: '',
         component: HomeComponent
+      },
+      {
+        path: 'details',
+        component: DetailsComponent
       }
     ]
   }

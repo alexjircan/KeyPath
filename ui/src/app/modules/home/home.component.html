@@ -1,4 +1,14 @@
 <div>
+    <form class="d-flex justify-content-center align-middle text-light text-center my-3">
+        <div class="mb-3 row">
+            <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">Search:</label>
+            <div class="col-xs-3 col-sm-auto">
+                <input id="table-filtering-search" class="form-control transparent-input text-light" type="text" [formControl]="filter" />
+            </div>
+        </div>
+    </form>
+</div>
+<div>
     <form [formGroup] = "form" (ngSubmit)="addAccount()">
         <table class="table text-light text-center table-borderless table-hover">
             <thead>
@@ -7,13 +17,15 @@
                     <th scope="col" >Website</th>
                     <th scope="col" >Username</th>
                     <th scope="col">Password</th>
+                    <th scope="col">Password Strength</th>
+                    <th scope="col">Time to crack</th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody class="text-light">
                     <tr>
-                        <td style="width:30%"></td>
+                        <td style="width:12%"></td>
                         <td>
                             <input 
                                 formControlName="website"  
@@ -43,8 +55,16 @@
                                 </button>
                             </div>
                         </td>
-
-                        <td style="width:15%" class="text-start">
+                        <td class="text-center text-light align-middle">
+                            <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success w-0"
+                                [ngClass]="inputPasswordClass"></div>
+                            </div>
+                        </td>
+                        <td  class="text-center text-light align-middle">
+                            {{inputPasswordCrackTime}}
+                        </td>
+                        <td class="text-start">
                             <div *ngIf="isLoading == false; else loading">
                                 <button type="submit" [disabled]="form.invalid" class="btn btn-light">
                                     <i class="fa-solid fa-plus"></i>
@@ -56,49 +76,90 @@
                                 </div>
                             </ng-template>
                         </td>
-                        <td style="width:15%"></td>
+                        <td style="width:12%"></td>
                     </tr>
                 <ng-template #tableloading>
                     <tr>
-                        <td colspan="6">
+                        <td colspan="8">
                             <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
                         </td>
                     </tr>          
                 </ng-template>
                 <ng-container *ngIf="!this.isTableLoading; else tableloading">
-                    <tr *ngFor="let account of accounts | async">
-                        <td style="width:30%"></td>
+                    <tr *ngFor="let account of accounts$ | async">
+                        <td style="width:12%"></td>
                         <td class="text-light align-middle">
-                            <div class="d-flex justify-content-center">
-                                <img [src]="account.validImgUrl" width="25">
+                            <div class="d-flex justify-content-center align-middle">
+                                <div class="p-1 align-middle text-center">
+                                    <img [src]="account.validImgUrl" width="25">
+                                </div>
                                 <div class="px-1">
-                                    <a class="link-light text-decoration-none" [href]="">
-                                        {{account.AccountUrl}}
-                                    </a>
+                                    <ng-container *ngIf="!account.editable; else editWebsite">
+                                        <div class="align-middle p-1">
+                                            <a class="link-light text-decoration-none" href="{{getValidUrl(account.AccountUrl)}}">
+                                                <ngb-highlight [result]="account.AccountUrl" [term]="filter.value"></ngb-highlight>
+                                            </a>
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #editWebsite>
+                                        <div>
+                                            <input 
+                                            class="form-control text-center border-0 "
+                                            (change)="onWebsiteChange($event, account)"
+                                            [ngClass]="{'transparent-input': !account.editable, 'text-light': !account.editable}"
+                                            [readonly]="!account.editable"
+                                            type="text"
+                                            value="{{account.AccountUrl}}">
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </div>
                         </td>
                         <td class="text-light align-middle">    
-                            {{account.AccountUserName}}
+                            <input 
+                                    class="form-control text-center border-0"
+                                    (input)="onUsernameChange($event, account)"
+                                    [ngClass]="{'transparent-input': !account.editable, 'text-light': !account.editable}"
+                                    [readonly]="!account.editable"
+                                    value="{{account.AccountUserName}}">
                         </td>
                         <td class="text-light">
                             <div class="input-group">
-                            <input 
-                                class="form-control text-center transparent-input text-light border-0"
-                                readonly
-                                [type]="account.showPassword === false ? 'password' : 'text'" 
-                                value="{{ account.AccountPassword }}">
-                            <button type="button" class="btn" (click)="account.showPassword = !account.showPassword">
-                                <fa-icon [icon]="account.showPassword ? faEye : faEyeSlash"></fa-icon>
-                            </button>
+                                <input 
+                                    class="form-control text-center border-0"
+                                    [ngClass]="{'transparent-input': !account.editable, 'text-light': !account.editable}"
+                                    [readonly]="!account.editable"
+                                    (input)="onPasswordChange($event, account)"
+                                    [type]="account.showPassword === false ? 'password' : 'text'" 
+                                    value="{{ account.AccountPassword }}">
+                                <button 
+                                    type="button" 
+                                    class="btn"
+                                    [ngClass]="{'btn-light': account.editable}"
+                                    (click)="account.showPassword = !account.showPassword">
+                                    <fa-icon [icon]="account.showPassword ? faEye : faEyeSlash"></fa-icon>
+                                </button>
                             </div>
                         </td>
-                        <td style="width:15%" class="text-start">
+                        <td class="text-light align-middle text-center" style="width:15%">
+                            <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                [ngClass]="computeStrengthClass(account.passwordStrength.score)"></div>
+                            </div>
+                        </td>
+                        <td class="text-center text-light align-middle">
+                              {{account.passwordStrength.crack_times_display.online_no_throttling_10_per_second}}
+                        </td>
+                        <td class="text-start" style="width:12%">
+                            <button type="button" class="me-2 btn btn-light text-dark" (click)="editAccount(account)">
+                                <fa-icon [spin]="account.editLoading" [icon]="!account.editLoading ? (account.editable ? faCheck : faPen) : faSpinner"></fa-icon>
+                            </button>
                             <button type="button" class="btn btn-danger text-dark" (click)="deleteAccount(account)">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
-                        <td style="width:15%"></td>
+                        <td style="width:12%">
+                        </td>
                     </tr>
                 </ng-container>
             </tbody>

@@ -2,6 +2,7 @@ import { AuthService } from "@/app/core/auth/auth.service";
 import { User } from "@/app/core/user";
 import { UserService } from "@/app/core/user.service";
 import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 
 @Component({
@@ -15,7 +16,8 @@ export class LayoutComponent implements OnInit {
 
     constructor(
         private $auth: AuthService,
-        private $userService: UserService
+        private $userService: UserService,
+        public $router: Router,
     ){
         this.user$ = this.$userService.getUserDetails();
     }
