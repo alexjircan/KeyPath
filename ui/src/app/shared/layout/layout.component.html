@@ -19,8 +19,8 @@
                                     <i class="fa-lg fa-solid fa-user"></i>
                                 </button>
                                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                    <button ngbDropdownItem>Action - 1</button>
-                                    <button ngbDropdownItem>Another Action</button>
+                                    <a class="btn" (click)="this.$router.navigate([''])" ngbDropdownItem>Home</a>
+                                    <button (click)="this.$router.navigate(['/details'])" ngbDropdownItem>Account Details</button>
                                     <button (click)="onLogout()" ngbDropdownItem>Logout</button>
                                 </div>
                             </div>

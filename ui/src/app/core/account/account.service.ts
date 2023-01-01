@@ -1,6 +1,7 @@
 import { HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, EMPTY, map, Observable } from "rxjs";
+import zxcvbn, { IZXCVBNResult } from "zxcvbn-typescript";
 import { ApiService } from "../api.service";
 import { Account } from "./account";
 
@@ -11,6 +12,10 @@ export class AccountService{
     constructor(
         private $api: ApiService,
     ){}
+
+    updateAccount(account: {id: number, AccountUserName: string, AccountPassword: string, AccountUrl: string}){
+        return this.$api.put('/account/update', account);
+    }
 
     addAccount(form: {website: string, username: string, password: string}){
         let formAux = {
@@ -33,20 +38,34 @@ export class AccountService{
         return url;
     }
 
+    getValidImgUrl(account: Account){
+        let queryParams = new HttpParams();
+        account.validImgUrl = "assets/defaultWebIcon.png";
+        queryParams = queryParams.append("url", this.getValidUrl(account.AccountUrl));
+        this.$api.get("/account/get-url-icon", {params: queryParams, responseType: 'blob'})
+        .subscribe(
+            (result) => {
+                if( result.type === "image/png" ) account.validImgUrl = this.getValidUrl(account.AccountUrl);
+            }
+        )
+    }
+
+    computePasswordStrength(password: string): IZXCVBNResult {
+        return zxcvbn(password);
+    }
+
     getAccounts(): Observable<Account[]> {
         const self = this;
         return this.$api.get("/account/getAll").pipe(
             map( (resp: {accounts: Account[]}) => {
                 resp.accounts.forEach( (account: Account) => {
-                    let queryParams = new HttpParams();
-                    account.validImgUrl = "assets/defaultWebIcon.png";
-                    queryParams = queryParams.append("url", this.getValidUrl(account.AccountUrl));
-                    this.$api.get("/account/get-url-icon", {params: queryParams, responseType: 'blob'})
-                    .subscribe(
-                        (result) => {
-                            if( result.type === "image/png" ) account.validImgUrl = this.getValidUrl(account.AccountUrl);
-                        }
-                    )
+                    account.showPassword = false;
+                    account.editable = false;
+                    account.editLoading = false;
+                    account.passwordStrength = this.computePasswordStrength(account.AccountPassword);
+
+                    this.getValidImgUrl(account);
+                    
                     return account;
                 })
                 return resp.accounts
