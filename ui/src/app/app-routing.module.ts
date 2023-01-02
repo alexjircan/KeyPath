@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/auth/auth.guard';
 import { AuthComponent } from './modules/auth/auth.component';
+import { ConfirmEmailComponent } from './modules/auth/confirm-email/confirm-email.component';
 import { DetailsComponent } from './modules/details/details.component';
 import { HomeComponent } from './modules/home/home.component';
-import { LoginComponent } from './modules/login/login.component';
-import { LoginGuard } from './modules/login/login.guard';
-import { RegisterComponent } from './modules/register/register.components';
-import { RegisterGuard } from './modules/register/register.guard';
+import { LoginComponent } from './modules/auth/login/login.component';
+import { LoginGuard } from './modules/auth/login/login.guard';
+import { RegisterComponent } from './modules/auth/register/register.components';
+import { RegisterGuard } from './modules/auth/register/register.guard';
 import { LayoutComponent } from './shared/layout/layout.component';
 
 const routes: Routes = [
@@ -29,6 +30,10 @@ const routes: Routes = [
         path: 'register',
         canActivate: [RegisterGuard],
         component: RegisterComponent
+      },
+      {
+        path: 'confirm-email',
+        component: ConfirmEmailComponent
       },
     ]
   },

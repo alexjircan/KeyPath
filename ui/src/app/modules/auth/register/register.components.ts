@@ -78,7 +78,7 @@ export class RegisterComponent implements OnInit{
             lastname: this.form.getRawValue().lastname,
             email: this.form.getRawValue().email,
             password: this.form.getRawValue().password}).subscribe(
-                resp => this.$router.navigate(['auth/login'], { queryParams: { fromregister: true } }),
+                resp => this.$router.navigate(['auth/confirm-email']),
                 err => {
                     if(err == "Registration failed") this.registerError = err;
                     else this.registerError = "Email already in use!"

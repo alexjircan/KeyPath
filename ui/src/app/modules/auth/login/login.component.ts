@@ -14,8 +14,7 @@ export class LoginComponent implements OnInit{
     @ViewChild('username') private usernameInput;
 
     isLoading: boolean = false;
-    loginError: boolean = false;
-    public fromRegister: boolean = false;
+    loginError: string = '';
     private targetRoute;
 
     public form: FormGroup<{
@@ -36,10 +35,6 @@ export class LoginComponent implements OnInit{
         });
 
         this.targetRoute = window.sessionStorage.getItem('target_route') || '';
-
-        this.$route.queryParams.subscribe(params => {
-            this.fromRegister = params['fromregister'];
-        })
     }
 
     onSubmit() {
@@ -59,7 +54,7 @@ export class LoginComponent implements OnInit{
                 this.$router.navigateByUrl(this.targetRoute);
                 window.sessionStorage.removeItem('target_route');
             },
-            err => this.loginError = true,
+            err => this.loginError = err,
         ).add( () => this.isLoading = false );
 
         this.isLoading = true;
