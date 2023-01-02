@@ -20,6 +20,10 @@ export class AuthService {
         this.loadToken();
       }
 
+    confirmEmail(token: string) {
+        return this.$api.get("/user/confirm-email", {params: {token: token}});
+    }
+
     loadToken() {
         const token = window.localStorage.getItem(environment.jwt.tokenKey);
         if (token) {
@@ -34,7 +38,7 @@ export class AuthService {
     login(form: {username: string; password: string}){
         return this.$api.post('/auth/login', {email: form.username, password: form.password}).pipe(
             map( (resp) => {
-                if ( !resp.access_token || !this.validateToken(resp.access_token) ) throw new Error("Invalid username or password.");
+                if ( !resp.access_token || !this.validateToken(resp.access_token) ) throw new Error(resp);
                 window.localStorage.setItem(environment.jwt.tokenKey, resp.access_token);
             } )
         );
@@ -45,6 +49,11 @@ export class AuthService {
         this.token = null;
         window.localStorage.removeItem(environment.jwt.tokenKey);
         window.location.reload();
+    }
+
+    logoutNoRefresh(){
+        this.user = null;
+        this.token = null;
     }
 
     register(form: {firstname: string, lastname: string, email: string; password: string}){
@@ -59,6 +68,9 @@ export class AuthService {
 
     validateToken(token: string){
         try{
+            if( this.$jwtHelper.isTokenExpired(token) ){
+                this.logout();
+            }
             this.user = this.$jwtHelper.decodeToken(token);
             this.token = token;
             return true;

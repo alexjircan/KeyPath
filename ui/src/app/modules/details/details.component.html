@@ -1,24 +1,29 @@
 <div class="d-flex justify-content-center">
-    <div>
+    <div *ngIf="(user$ | async) as user; else loading">
         <form class="text-light text-center my-3">
                 <div class="d-flex justify-content-end mb-3 row">
                     <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">First Name:</label>
-                    <div  *ngIf="(user$ | async) as user" class="col-xs-3 col-sm-auto">
+                    <div   class="col-xs-3 col-sm-auto">
                         <input disabled value="{{ user.firstname }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-end  mb-3 row">
                     <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">Last Name:</label>
-                    <div  *ngIf="(user$ | async) as user" class="col-xs-3 col-sm-auto">
+                    <div class="col-xs-3 col-sm-auto">
                         <input disabled value="{{ user.lastname }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-end mb-3 row">
                     <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">Email:</label>
-                    <div  *ngIf="(user$ | async) as user" class="col-xs-3 col-sm-auto">
+                    <div class="col-xs-3 col-sm-auto">
                         <input disabled value="{{ user.email }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
         </form>
     </div>
 </div>
+<ng-template #loading>
+    <div class="p-3 d-flex justify-content-center">
+        <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+    </div>
+</ng-template>
