@@ -1,0 +1,44 @@
+<div class="d-flex text-light align-items-center justify-content-center">
+    <div>
+        <div class="p-5">
+            <img class="logo mx-auto d-block" src="/assets/logo.png"/>
+        </div>
+        <div class="card bg-opacity-75 bg-dark card-body ml-2 mr-2 login-card">
+            <div *ngIf="fromRegister; else confirm_block">
+                <div class="text-center text-success">
+                    <i class="text-success fa-xl fa-solid fa-circle-check"></i>
+                    <div class="pt-3">
+                        <h3>Thank you!</h3>
+                        <p>A confirmation has been sent to your email.</p>
+                    </div>
+                    <div class="text-center p-3">
+                        <a class="btn btn-dark" (click)="this.$router.navigate(['auth/login'])">Continue</a>
+                    </div>
+                </div>
+            </div>
+            <ng-template #confirm_block>
+                <div *ngIf="message != ''; else loading" class="text-center">
+                    <div *ngIf="success == false; else success_block" class="p-3">
+                        <i class="text-danger fa-xl fa-solid fa-circle-xmark"></i>
+                        <div class="py-3">
+                            <span class="text-danger"><h4>{{message}}</h4></span>
+                        </div>
+                    </div>
+                    <ng-template #success_block>
+                        <i class="text-success fa-xl fa-solid fa-circle-check"></i>
+                        <p class="text-success"><b>Congratulations,<br> your account has been successfully created!<br>
+                        You can now login.</b></p>
+                    </ng-template>
+                    <div class="text-center p-3">
+                        <a class="btn btn-dark" (click)="this.$router.navigate(['auth/login'])">Continue</a>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #loading>
+                <div class="p-3 d-flex justify-content-center">
+                    <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
