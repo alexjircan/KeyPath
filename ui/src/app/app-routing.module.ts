@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, UrlSegment } from '@angular/router';
 import { AuthGuard } from './core/auth/auth.guard';
 import { AuthComponent } from './modules/auth/auth.component';
 import { ConfirmEmailComponent } from './modules/auth/confirm-email/confirm-email.component';
@@ -10,6 +10,8 @@ import { LoginGuard } from './modules/auth/login/login.guard';
 import { RegisterComponent } from './modules/auth/register/register.components';
 import { RegisterGuard } from './modules/auth/register/register.guard';
 import { LayoutComponent } from './shared/layout/layout.component';
+import { PasswordResetComponent } from './modules/auth/password-reset/password-reset.component';
+import { PasswordResetTokenComponent } from './modules/auth/password-reset-token/password-reset-token.component';
 
 const routes: Routes = [
   {
@@ -34,6 +36,14 @@ const routes: Routes = [
       {
         path: 'confirm-email',
         component: ConfirmEmailComponent
+      },
+      {
+        path: 'password-reset/:token',
+        component: PasswordResetTokenComponent,
+      },
+      {
+        path: 'password-reset',
+        component: PasswordResetComponent
       },
     ]
   },

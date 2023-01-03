@@ -17,6 +17,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DetailsModule } from './modules/details/details.module';
 import { ConfirmEmailComponent } from './modules/auth/confirm-email/confirm-email.component';
 import { ConfirmEmailModule } from './modules/auth/confirm-email/confirm-email.module';
+import { PasswordResetComponent } from './modules/auth/password-reset/password-reset.component';
+import { PasswordResetModule } from './modules/auth/password-reset/password-reset.module';
+import { PasswordResetTokenComponent } from './modules/auth/password-reset-token/password-reset-token.component';
+import { PasswordResetTokenModule } from './modules/auth/password-reset-token/password-reset-token.module';
 
 @NgModule({
   declarations: [
@@ -30,6 +34,8 @@ import { ConfirmEmailModule } from './modules/auth/confirm-email/confirm-email.m
     HomeModule,
     DetailsModule,
     ConfirmEmailModule,
+    PasswordResetModule,
+    PasswordResetTokenModule,
     AuthModule,
     LoginModule,
     RegisterModule,
