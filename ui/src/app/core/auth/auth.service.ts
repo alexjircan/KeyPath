@@ -20,6 +20,10 @@ export class AuthService {
         this.loadToken();
     }
 
+    changePassword(password: string){
+        return this.$api.patch("/user/change-password", {password: password});
+    }
+
     resetPassword(token: string, password: string){
         return this.$api.patch("/user/reset-password", {password: password}, {params: {token: token}})
     }

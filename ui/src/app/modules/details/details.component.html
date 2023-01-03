@@ -1,28 +1,84 @@
 <div class="d-flex justify-content-center">
-    <div *ngIf="(user$ | async) as user; else loading">
+    <div *ngIf="(user$ | async) as user; else loadingBlock">
         <form class="text-light text-center my-3">
                 <div class="d-flex justify-content-end mb-3 row">
-                    <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">First Name:</label>
+                    <label for="table-filtering-search1" class="col-xs-3 col-sm-auto col-form-label">First Name:</label>
                     <div   class="col-xs-3 col-sm-auto">
-                        <input disabled value="{{ user.firstname }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
+                        <input disabled value="{{ user.firstname }}" id="table-filtering-search1" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-end  mb-3 row">
-                    <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">Last Name:</label>
+                    <label for="table-filtering-search2" class="col-xs-3 col-sm-auto col-form-label">Last Name:</label>
                     <div class="col-xs-3 col-sm-auto">
-                        <input disabled value="{{ user.lastname }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
+                        <input disabled value="{{ user.lastname }}" id="table-filtering-search2" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-end mb-3 row">
-                    <label for="table-filtering-search" class="col-xs-3 col-sm-auto col-form-label">Email:</label>
+                    <label for="table-filtering-search3" class="col-xs-3 col-sm-auto col-form-label">Email:</label>
                     <div class="col-xs-3 col-sm-auto">
-                        <input disabled value="{{ user.email }}" id="table-filtering-search" class="form-control transparent-input text-light" type="text" />
+                        <input disabled value="{{ user.email }}" id="table-filtering-search3" class="form-control transparent-input text-light" type="text" />
                     </div>
                 </div>
+                <div *ngIf="!this.changePass; else changePassBlock">
+                    <button type="button" (click)="this.changePass = true; this.passChanged = false;" class="btn btn-light">Change Password</button>
+                </div>
+                <div *ngIf="passChanged" class="card bg-opacity-75 bg-dark card-body mt-3">
+                    <i class="text-success fa-xl fa-solid fa-circle-check"></i>
+                    <span class="text-success">
+                        Your password has been changed successfully.
+                    </span>
+                </div>
+                <ng-template #changePassBlock>
+                    <form (ngSubmit)="onSubmit()" [formGroup] = "form">
+                        <div class="d-flex justify-content-end mb-3 row">
+                            <label for="password" class="col-xs-3 col-sm-auto col-form-label">New Password:</label>
+                            <div   class="col-xs-3 col-sm-auto">
+                                <input formControlName="password" type="password" [ngClass]="{'is-invalid': form.hasError('notSame')}" class="form-control" id="password" placeholder="Password" />
+                            </div>
+                        </div>
+                        <div *ngIf="this.form.get('password').hasError('pattern')" class="d-flex justify-content-end mb-3 row text-danger">
+                            <div style="width: 24rem; text-align: left;">
+                                <p class="m-0">&emsp;Password Requirements:</p>
+                                <ul>
+                                    <li>Must contain at least 8 characters</li>
+                                    <li>Must contain at least one uppercase letter</li>
+                                    <li>Must contain at least one lowercase letter</li>
+                                    <li>Must contain at least one number</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mb-3 row">
+                            <label class="col-xs-3 col-sm-auto col-form-label">Confirm New Password: </label>
+                            <div   class="col-xs-3 col-sm-auto">
+                                <input formControlName="conPassword" type="password" [ngClass]="{'is-invalid': form.hasError('notSame')}" class="form-control" id="conPassword" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mb-3 row text-danger" *ngIf="form.hasError('notSame')">
+                            <div style="width: 24rem; text-align: left;">
+                                <p class="m-0">&emsp;Passwords does not match</p>
+                            </div>
+                        </div>
+                        <div class="px-2" *ngIf="this.errorMessage != ''">
+                            <small class="form-text text-danger">{{this.errorMessage}}</small>
+                        </div>
+                        <div class="p-2 d-flex justify-content-center">
+                            <div *ngIf="!loading; else loadingIcon">
+                                <button [disabled]="!this.form.valid" type="submit" class="btn btn-secondary">
+                                    Confirm
+                                </button>
+                            </div>
+                            <ng-template #loadingIcon>
+                                <div>
+                                    <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </form>
+                </ng-template>
         </form>
     </div>
 </div>
-<ng-template #loading>
+<ng-template #loadingBlock>
     <div class="p-3 d-flex justify-content-center">
         <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
     </div>
