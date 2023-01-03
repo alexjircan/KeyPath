@@ -42,7 +42,7 @@ class EmailSender(metaclass=Singleton):
     def send_reset_email(self, to_email, name, token):
         mail_subject = "Reset your password"
         message = "Hello " + name + ",\n\nPlease click on the link below to reset your password:\n\n" + \
-                  "http://localhost:4200/reset-password?token=" + token
+                  "http://localhost:4200/auth/password-reset/" + token
         email = EmailMessage(mail_subject, message, to={to_email})
         if email.send():
             return "success"

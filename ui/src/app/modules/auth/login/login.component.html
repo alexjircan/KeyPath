@@ -1,7 +1,9 @@
 <div class="d-flex text-light align-items-center justify-content-center">
     <div>
         <div class="p-5">
-            <img class="logo mx-auto d-block" src="/assets/logo.png"/>
+            <a role="button" (click)="this.$router.navigate([''])">
+                <img class="logo mx-auto d-block" src="/assets/logo.png"/>
+            </a>
         </div>
         <div class="card bg-opacity-75 bg-dark card-body ml-2 mr-2 login-card">
             <form (ngSubmit)="onSubmit()" [formGroup] = "form">
@@ -28,6 +30,9 @@
                 </div>
                 <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a role="button"
                     (click)="this.$router.navigate(['auth/register'])" class="link-primary">Register</a>
+                </p>
+                <p class="small fw-bold mt-2 pt-1 mb-0">Trouble signing in? <a role="button"
+                    (click)="this.$router.navigate(['auth/password-reset'])" class="link-primary">Reset your password</a>
                 </p>
             </form>
         </div>

@@ -1,7 +1,9 @@
 <div class="d-flex text-light align-items-center justify-content-center">
     <div>
         <div class="p-5">
-            <img class="logo mx-auto d-block" src="/assets/logo.png"/>
+            <a role="button" (click)="this.$router.navigate([''])">
+                <img class="logo mx-auto d-block" src="/assets/logo.png"/>
+            </a>
         </div>
         <div class="card bg-opacity-75 bg-dark card-body ml-2 mr-2 login-card">
             <div *ngIf="fromRegister; else confirm_block">

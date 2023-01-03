@@ -18,7 +18,15 @@ export class AuthService {
         private $jwtHelper: JwtHelperService,
       ) {
         this.loadToken();
-      }
+    }
+
+    resetPassword(token: string, password: string){
+        return this.$api.patch("/user/reset-password", {password: password}, {params: {token: token}})
+    }
+
+    sendResetEmail(email: string) {
+        return this.$api.post("/user/send-reset-email", {email: email});
+    }
 
     confirmEmail(token: string) {
         return this.$api.get("/user/confirm-email", {params: {token: token}});
